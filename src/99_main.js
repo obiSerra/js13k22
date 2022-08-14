@@ -9,51 +9,74 @@
 
   const { loop } = modules["game_loop"];
   const { getCanvas, getCtx, element, removeClass, addClass, onClick } = modules["dom"];
+  const { Entity, Player } = modules["entities"];
+
+  const fadeIn = el => {
+    removeClass(el, "hidden");
+    addClass(el, "fade-in");
+  };
+
+  const hide = el => {
+    removeClass(el, "fade-in");
+    addClass(el, "hidden");
+  };
+
+  class GameState {
+    constructor() {
+      this._state = "loading";
+    }
+    st_start() {
+      this._state = "start";
+    }
+    st_title() {
+      this._state = "title";
+    }
+    st_running() {
+      this._state = "running";
+    }
+    get_state() {
+      return this._state;
+    }
+  }
 
   class Game {
     constructor() {
       this.canvas = getCanvas();
-      // this.canvas.width = element("html").clientWidth;
-      // this.canvas.height = element("html").clientHeight;
-      // this.canvas.width = window.innerWidth;
-      // this.canvas.height = window.innerHeight;
+
       this.canvas.width = document.documentElement.clientWidth - 50;
       this.canvas.height = document.documentElement.clientHeight - 50;
 
       this.ctx = getCtx(this.canvas);
       this.loop = loop;
-
-      this.state = "loading";
+      this.state = new GameState();
 
       onClick(element("#start"), () => {
         console.log("START");
-        this.state = "start";
+        this.state.st_start();
       });
     }
 
     _display_init() {
-      const title = element("#title");
-      removeClass(title, "hidden");
-      addClass(title, "fade-in");
-
-      setTimeout(() => {
-        const startBtn = element("#start-container");
-        removeClass(startBtn, "hidden");
-        addClass(startBtn, "fade-in");
-      }, 3000);
+      fadeIn(element("#title"));
+      fadeIn(element("#start-container"));
     }
 
     onStep(time) {
-      if (this.state === "loading") {
-        this._display_init();
-      } else if (this.state === "start") {
-        const start = element("#start-container");
-        const title = element("#title");
-        addClass(start, "hidden");
-        removeClass(start, "fade-in");
-        addClass(title, "hidden");
-        removeClass(title, "fade-in");
-        this.state = "running";
+      switch (this.state.get_state()) {
+        case "loading":
+          this._display_init();
+          this.state.st_title();
+          break;
+        case "start":
+          hide(element("#start-container"));
+          hide(element("#title"));
+
+          const p = new Player({x: 100, y: 100});
+
+          this.state.st_running();
+          break;
+        case "running":
+          break;
       }
       //console.log(time);
     }
