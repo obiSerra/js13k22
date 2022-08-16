@@ -31,6 +31,9 @@
     st_title() {
       this._state = "title";
     }
+    st_init_running() {
+      this._state = "init_running";
+    }
     st_running() {
       this._state = "running";
     }
@@ -49,6 +52,10 @@
       this.ctx = getCtx(this.canvas);
       this.loop = loop;
       this.state = new GameState();
+      // TO DEBUG quickly
+      this.state.st_init_running();
+
+      this.character = null;
 
       onClick(element("#start"), () => {
         console.log("START");
@@ -61,7 +68,14 @@
       fadeIn(element("#start-container"));
     }
 
+    _on_run(time) {
+
+      this.character.update(time);
+      this.character.render(time);
+    }
+
     onStep(time) {
+      this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
       switch (this.state.get_state()) {
         case "loading":
           this._display_init();
@@ -70,12 +84,14 @@
         case "start":
           hide(element("#start-container"));
           hide(element("#title"));
-
-          const p = new Player({x: 100, y: 100});
-
+          this.state.st_init_running();
+          break;
+        case "init_running":
+          this.character = new Player({ x: 100, y: 100 }, this.ctx, this.state);
           this.state.st_running();
           break;
         case "running":
+          this._on_run(time);
           break;
       }
       //console.log(time);

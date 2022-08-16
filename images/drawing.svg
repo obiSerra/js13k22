@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+<svg width="300" height="300" version="1.1" viewBox="0 0 79.375 79.375" xmlns="http://www.w3.org/2000/svg">
+ <rect x="24.001" y="31.129" width="23.516" height="31.12" fill="#00f" stroke="#fff" stroke-width=".13819"/>
+ <path d="m62.964 40.867-16.157 8.316-0.4752-2.8512 14.494-7.128z" stroke="#000" stroke-width=".26458px"/>
+ <path d="m47.517 62.248 5.2302 7.3686-0.4752 9.7416-6.4152 0.2376-0.4752-8.5536-7.128-9.504-11.167 8.5536-0.4752 9.2664-8.7912 0.2376v-10.93l6.1805-6.4182z" fill="#000080" stroke="#000" stroke-width=".26458px"/>
+ <g>
+  <rect x="50.168" y="35.84" width="21.146" height="2.6136" stroke="#fff" stroke-width=".13229"/>
+  <rect x="50.168" y="38.454" width="21.146" height="2.6136" stroke="#fff" stroke-width=".13229"/>
+  <path d="m50.168 35.84-9.9792 0.4752 0.2376 9.7416 9.7416-4.9896z" fill="#a05a2c" stroke="#000" stroke-width=".26458px"/>
+ </g>
+ <g>
+  <ellipse cx="36.353" cy="20.077" rx="13.068" ry="12.712" fill="#faa" stroke="#fff" stroke-width=".13229"/>
+ </g>
+ <g fill="#f00" stroke="#fff" stroke-width=".13229">
+  <ellipse d="M 23.05743,19.706666 A 13.068,12.711599 0 0 1 29.382595,8.3097114 13.068,12.711599 0 0 1 42.6971,8.2228925 13.068,12.711599 0 0 1 49.178771,19.536339"/>
+  <rect x="49.179" y="18.967" width="13.785" height=".5695"/>
+ </g>
+</svg>
