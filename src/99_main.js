@@ -21,6 +21,8 @@
     addClass(el, "hidden");
   };
 
+  const { Map } = modules["map"];
+
   class GameState {
     constructor() {
       this._state = "loading";
@@ -42,6 +44,15 @@
     }
   }
 
+  const collision = (a, b) => {
+    return (
+      a.pos.x < b.pos.x + b.size.x &&
+      a.pos.x + a.size.x > b.pos.x &&
+      a.pos.y < b.pos.y + b.size.y &&
+      a.pos.y + a.size.y > b.pos.y
+    );
+  };
+
   class Game {
     constructor() {
       this.canvas = getCanvas();
@@ -56,7 +67,7 @@
       this.state.st_init_running();
 
       this.character = null;
-
+      this.map = new Map(this.ctx);
       onClick(element("#start"), () => {
         console.log("START");
         this.state.st_start();
@@ -68,10 +79,27 @@
       fadeIn(element("#start-container"));
     }
 
-    _on_run(time) {
+    _calculate_collisions(entities) {
+      for (let i = 0; i < entities.length; i++) {
+        const element = entities[i];
+        for (let j = 0; j < entities.length; j++) {
+          const other = entities[j];
+          if (element === other) continue;
+          if (collision(element, other)) {
+            element.onCollision(other);
+            other.onCollision(element);
+          }
+        }
+      }
+    }
 
+    _on_run(time) {
+      const tiles = this.map.getTiles();
+      this._calculate_collisions([...tiles, this.character]);
+      // console.log(tiles);
       this.character.update(time);
       this.character.render(time);
+      this.map.render(time);
     }
 
     onStep(time) {

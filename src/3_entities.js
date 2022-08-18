@@ -3,16 +3,23 @@ window.notTheEnd["entities"] = game => {
   const { CharImage, ash } = game["images"](game);
 
   class Entity {
-    constructor(pos, ctx, gameState) {
+    type = null;
+    constructor(pos, ctx, gameState, size) {
       this.pos = pos;
       this.ctx = ctx;
       this.gameState = gameState;
+      this.size = size;
     }
+
+    render() {}
+
+    onCollision(other) {}
   }
 
   class Player extends Entity {
+    type = "player";
     constructor(pos, ctx, gameState) {
-      super(pos, ctx, gameState);
+      super(pos, ctx, gameState, { x: 50, y: 50 });
       this._set_controls();
       this.baseSpeed = 3;
       this.moving = 0;
@@ -27,10 +34,11 @@ window.notTheEnd["entities"] = game => {
     render(time) {
       this.ctx.beginPath();
       if (this.moving) {
-        this.sprite.moveAnimation(time)
+        this.sprite.moveAnimation(time);
       }
-      this.ctx.drawImage(this.sprite.getImg(), this.pos.x, this.pos.y, 50, 50);
-      this.ctx.fill();
+      this.ctx.rect(this.pos.x, this.pos.y, this.size.x, this.size.y);
+      this.ctx.stroke();
+      this.ctx.drawImage(this.sprite.getImg(), this.pos.x, this.pos.y, this.size.x, this.size.y);
     }
 
     moveRight() {
@@ -71,7 +79,6 @@ window.notTheEnd["entities"] = game => {
         switch (e.code) {
           case "ArrowUp":
           case "KeyW":
-            console.log("UP");
             break;
           case "ArrowDown":
           case "KeyS":
@@ -84,7 +91,6 @@ window.notTheEnd["entities"] = game => {
           case "ArrowRight":
           case "KeyD":
             this.moveRight();
-            console.log("RIGHT");
             break;
           case "Space":
             console.log("SPACE");
@@ -92,6 +98,20 @@ window.notTheEnd["entities"] = game => {
         }
         // console.log(e.code);
       });
+    }
+
+    onCollision(other) {
+      if (other.type === "tile") {
+        const c = this.pos.x + this.size.x / 2;
+        const oC = other.pos.x + other.size.x / 2;
+        // console.log("right", this.pos.x + this.size.x > other.pos.x);
+        if (c > oC) {
+          console.log("left");
+          this.moving = this.moving > 0 ? this.moving : 0;
+        } else if (c < oC) {
+          this.moving = this.moving < 0 ? this.moving : 0;
+        }
+      }
     }
   }
 
