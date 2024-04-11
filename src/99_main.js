@@ -95,6 +95,10 @@
 
     _on_run(time) {
       const tiles = this.map.getTiles();
+      const entities = [this.character];
+
+      entities.filter(e => !!e.hasMass).forEach(e => e.applyGravity(tiles));
+
       this._calculate_collisions([...tiles, this.character]);
       // console.log(tiles);
       this.character.update(time);

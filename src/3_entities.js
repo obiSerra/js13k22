@@ -9,11 +9,30 @@ window.notTheEnd["entities"] = game => {
       this.ctx = ctx;
       this.gameState = gameState;
       this.size = size;
+      this.hasMass = false;
+      this.movingX = 0;
+      this.movingY = 0;
     }
 
     render() {}
 
     onCollision(other) {}
+
+    calcBox() {
+      const pxs = new Set();
+      for (let i = 0; i < this.size.x; i++) {
+        for (let j = 0; j < this.size.y; j++) {
+          pxs.add(`${Math.round(this.pos.x + i)}_${Math.round(this.pos.y + j)}`);
+        }
+      }
+      return Array.from(pxs);
+    }
+
+    applyGravity() {
+      if (this.hasMass) {
+        this.movingY += 0.1;
+      }
+    }
   }
 
   class Player extends Entity {
@@ -22,18 +41,21 @@ window.notTheEnd["entities"] = game => {
       super(pos, ctx, gameState, { x: 50, y: 50 });
       this._set_controls();
       this.baseSpeed = 3;
-      this.moving = 0;
+
       this.sprite = new CharImage(ash());
       this.right = true;
+      this.hasMass = true;
+      this.onGround = false;
     }
 
     update() {
-      this.pos.x = this.pos.x + this.moving;
+      this.pos.x = Math.round(this.pos.x + this.movingX);
+      this.pos.y = Math.round(this.pos.y + this.movingY);
     }
 
     render(time) {
       this.ctx.beginPath();
-      if (this.moving) {
+      if (this.movingX) {
         this.sprite.moveAnimation(time);
       }
       this.ctx.rect(this.pos.x, this.pos.y, this.size.x, this.size.y);
@@ -46,7 +68,7 @@ window.notTheEnd["entities"] = game => {
         this.right = !this.right;
         this.sprite.flipH();
       }
-      this.moving = this.baseSpeed;
+      this.movingX = this.baseSpeed;
     }
 
     moveLeft() {
@@ -54,7 +76,7 @@ window.notTheEnd["entities"] = game => {
         this.right = !this.right;
         this.sprite.flipH();
       }
-      this.moving = -this.baseSpeed;
+      this.movingX = -this.baseSpeed;
     }
 
     _set_controls() {
@@ -70,7 +92,7 @@ window.notTheEnd["entities"] = game => {
           case "KeyA":
           case "ArrowRight":
           case "KeyD":
-            this.moving = 0;
+            this.movingX = 0;
             break;
         }
       });
@@ -79,6 +101,11 @@ window.notTheEnd["entities"] = game => {
         switch (e.code) {
           case "ArrowUp":
           case "KeyW":
+            console.log("SPACE", this.onGround);
+            if (this.onGround) {
+              this.movingY = -3;
+              this.onGround = false;
+            }
             break;
           case "ArrowDown":
           case "KeyS":
@@ -93,7 +120,6 @@ window.notTheEnd["entities"] = game => {
             this.moveRight();
             break;
           case "Space":
-            console.log("SPACE");
             break;
         }
         // console.log(e.code);
@@ -102,14 +128,28 @@ window.notTheEnd["entities"] = game => {
 
     onCollision(other) {
       if (other.type === "tile") {
-        const c = this.pos.x + this.size.x / 2;
-        const oC = other.pos.x + other.size.x / 2;
+        const min_box = this.calcBox();
+        const other_box = other.calcBox();
+        // const intersection = min_box.filter(x => other_box.includes(x));
+        // console.log(intersection);
+        // debugger;
+        const cX = this.pos.x + this.size.x / 2;
+        const oCx = other.pos.x + other.size.x / 2;
+        const cY = this.pos.y + this.size.y / 2;
+        const oCy = other.pos.y - other.size.y / 2;
         // console.log("right", this.pos.x + this.size.x > other.pos.x);
-        if (c > oC) {
-          console.log("left");
-          this.moving = this.moving > 0 ? this.moving : 0;
-        } else if (c < oC) {
-          this.moving = this.moving < 0 ? this.moving : 0;
+        if (cY > oCy) {
+          this.onGround = true;
+          this.movingY = this.movingY < 0 ? this.movingY : 0;
+          return;
+        } else {
+          this.onGround = false;
+          this.movingY = this.movingY > 0 ? this.movingY : 0;
+        }
+        if (cX > oCx) {
+          this.movingX = this.movingX > 0 ? this.movingX : 0;
+        } else if (cX < oCx) {
+          this.movingX = this.movingX < 0 ? this.movingX : 0;
         }
       }
     }
